@@ -7,7 +7,7 @@
   # Enable X11 (even if you use Wayland, this provides fallback and utilities)
   services.xserver = {
     enable = true;
-    videoDrivers = [ "nvidia" ];
+    videoDrivers = [ "amdgpu" "nvidia" ];
   };
 
   # Enable OpenGL (needed for both X11 and Wayland compositors)
@@ -21,7 +21,7 @@
     modesetting.enable = true; # Required for Wayland + modern rendering
 
     # Power management (optional)
-    powerManagement.enable = false;
+    powerManagement.enable = true;
     powerManagement.finegrained = false;
 
     # Use proprietary driver (open=false is safest right now)
@@ -50,16 +50,18 @@
   # Kernel parameters for stability (Wayland + Hyprland)
   boot.kernelParams = [
     "nvidia-drm.modeset=1"
-    "nvidia-drm.fbdev=1"
+    "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
   ];
 
-  # Environment variables for Wayland/Electron apps
+  # Environment variables
   environment.variables = {
-    "GBM_BACKEND" = "nvidia-drm";
-    "__GLX_VENDOR_LIBRARY_NAME" = "nvidia";
-    "LIBVA_DRIVER_NAME" = "nvidia";
-    "XDG_SESSION_TYPE" = "wayland";
-    "WLR_NO_HARDWARE_CURSORS" = "1"; # helps prevent invisible cursor issue
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    LIBVA_DRIVER_NAME = "nvidia";
+    WLR_NO_HARDWARE_CURSORS = "1";
   };
+
+  # For Wayland compatibility
+  hardware.nvidia.prime.sync.enable = false; # Use offload mode only
 }
 
